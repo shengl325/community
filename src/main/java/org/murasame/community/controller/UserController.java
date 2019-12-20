@@ -1,6 +1,7 @@
 package org.murasame.community.controller;
 
 import org.apache.commons.lang3.StringUtils;
+import org.murasame.community.annotation.LoginRequired;
 import org.murasame.community.entity.User;
 import org.murasame.community.service.UserService;
 import org.murasame.community.util.CommunityUtil;
@@ -43,11 +44,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path = "setting", method = RequestMethod.GET)
     public String getSettingPage() {
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path = "upload", method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model) {
         if (headerImage == null) {
