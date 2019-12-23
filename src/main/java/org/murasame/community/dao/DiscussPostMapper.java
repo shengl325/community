@@ -1,6 +1,5 @@
 package org.murasame.community.dao;
 
-import com.jhlabs.image.DissolveFilter;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.murasame.community.entity.DiscussPost;
@@ -19,5 +18,7 @@ public interface DiscussPostMapper {
     int insertDiscussPost(DiscussPost discussPost);
 
     DiscussPost selectDiscussPostById(int id);
+
+    int updateCommentCount(int id, int commentCount);
 
 }
