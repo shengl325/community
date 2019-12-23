@@ -8,7 +8,7 @@
         id, user_id, entity_type, entity_id, target_id, content, status, create_time
     </sql>
 
-    <sql id="selectFields">
+    <sql id="insertFields">
         user_id, entity_type, entity_id, target_id, content, status, create_time
     </sql>
 

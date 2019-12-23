@@ -3,9 +3,11 @@ package org.murasame.community;
 import org.junit.jupiter.api.Test;
 import org.murasame.community.dao.DiscussPostMapper;
 import org.murasame.community.dao.LoginTicketMapper;
+import org.murasame.community.dao.MessageMapper;
 import org.murasame.community.dao.UserMapper;
 import org.murasame.community.entity.DiscussPost;
 import org.murasame.community.entity.LoginTicket;
+import org.murasame.community.entity.Message;
 import org.murasame.community.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +28,9 @@ public class MapperTests {
 
     @Autowired
     private LoginTicketMapper loginTicketMapper;
+
+    @Autowired
+    private MessageMapper messageMapper;
 
     @Test
     public void testSelectUser() {
@@ -69,7 +74,7 @@ public class MapperTests {
     @Test
     public void testSelectPosts() {
         List<DiscussPost> list = discussPost.selectDiscussPosts(0, 0, 0);
-        for(DiscussPost post: list) {
+        for (DiscussPost post : list) {
             System.out.println(post);
         }
 
@@ -94,6 +99,28 @@ public class MapperTests {
         System.out.println(loginTicket);
 
         loginTicketMapper.updateStatus("abc", 1);
+    }
+
+    @Test
+    public void testSelectMessage() {
+        List<Message> list = messageMapper.selectConversations(111, 0, 20);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        int count = messageMapper.selectConversationCount(111);
+        System.out.println(count);
+
+        list = messageMapper.selectLetters("111_112", 0, 10);
+        for (Message message : list) {
+            System.out.println(message);
+        }
+
+        count = messageMapper.selectLetterCount("111_112");
+        System.out.println(count);
+
+        count = messageMapper.selectLetterUnreadCount(131, "111_131");
+        System.out.println(count);
     }
 
 }
