@@ -3,6 +3,7 @@ package org.murasame.community.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.murasame.community.annotation.LoginRequired;
 import org.murasame.community.entity.User;
+import org.murasame.community.service.LikeService;
 import org.murasame.community.service.UserService;
 import org.murasame.community.util.CommunityUtil;
 import org.murasame.community.util.HostHolder;
@@ -40,6 +41,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private LikeService likeService;
 
     @Autowired
     private HostHolder hostHolder;
@@ -105,6 +109,23 @@ public class UserController {
         } catch (IOException e) {
             logger.error("读取头像失败: " + e.getMessage());
         }
+    }
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) {
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+        return "site/profile";
     }
 
 }
