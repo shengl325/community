@@ -3,8 +3,10 @@ package org.murasame.community.controller;
 import org.apache.commons.lang3.StringUtils;
 import org.murasame.community.annotation.LoginRequired;
 import org.murasame.community.entity.User;
+import org.murasame.community.service.FollowService;
 import org.murasame.community.service.LikeService;
 import org.murasame.community.service.UserService;
+import org.murasame.community.util.CommunityConstant;
 import org.murasame.community.util.CommunityUtil;
 import org.murasame.community.util.HostHolder;
 import org.slf4j.Logger;
@@ -26,7 +28,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements CommunityConstant {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -44,6 +46,9 @@ public class UserController {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @Autowired
     private HostHolder hostHolder;
@@ -124,6 +129,19 @@ public class UserController {
         // 点赞数量
         int likeCount = likeService.findUserLikeCount(userId);
         model.addAttribute("likeCount", likeCount);
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount);
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+        // 是否已关注
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null) {
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(),
+                    ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
 
         return "site/profile";
     }
