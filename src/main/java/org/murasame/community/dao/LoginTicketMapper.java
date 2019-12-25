@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.*;
 import org.murasame.community.entity.LoginTicket;
 
 @Mapper
+@Deprecated
 public interface LoginTicketMapper {
 
     @Insert({
