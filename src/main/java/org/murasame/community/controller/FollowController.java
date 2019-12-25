@@ -1,8 +1,10 @@
 package org.murasame.community.controller;
 
 import org.murasame.community.annotation.LoginRequired;
+import org.murasame.community.entity.Event;
 import org.murasame.community.entity.Page;
 import org.murasame.community.entity.User;
+import org.murasame.community.event.EventProducer;
 import org.murasame.community.service.FollowService;
 import org.murasame.community.service.UserService;
 import org.murasame.community.util.CommunityConstant;
@@ -31,6 +33,8 @@ public class FollowController implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
 
     @RequestMapping(path = "/follow", method = RequestMethod.POST)
     @ResponseBody
@@ -39,6 +43,15 @@ public class FollowController implements CommunityConstant {
         User user = hostHolder.getUser();
 
         followService.follow(user.getId(), entityType, entitId);
+
+        // 触发关注事件
+        Event event = new Event()
+                .setTopic(TOPIC_FOLLOW)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(entityType)
+                .setEntityId(entitId)
+                .setEntityUserId(entitId);
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJSONString(0, "已关注!");
     }

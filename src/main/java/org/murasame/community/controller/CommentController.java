@@ -1,7 +1,12 @@
 package org.murasame.community.controller;
 
 import org.murasame.community.entity.Comment;
+import org.murasame.community.entity.DiscussPost;
+import org.murasame.community.entity.Event;
+import org.murasame.community.event.EventProducer;
 import org.murasame.community.service.CommentService;
+import org.murasame.community.service.DiscussPostService;
+import org.murasame.community.util.CommunityConstant;
 import org.murasame.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,13 +18,19 @@ import java.util.Date;
 
 @Controller
 @RequestMapping("/comment")
-public class CommentController {
+public class CommentController implements CommunityConstant {
 
     @Autowired
     private CommentService commentService;
 
     @Autowired
+    private DiscussPostService discussPostService;
+
+    @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private EventProducer eventProducer;
 
     @RequestMapping(path = "/add/{discussPostId}", method = RequestMethod.POST)
     public String addComment(@PathVariable("discussPostId") int discussPostId, Comment comment) {
@@ -28,7 +39,25 @@ public class CommentController {
         comment.setCreateTime(new Date());
         commentService.addComment(comment);
 
-        return "redirect:/discuss/detail" + discussPostId ;
+        // 触发评论事件
+        Event event = new Event()
+                .setTopic(TOPIC_COMMENT)
+                .setUserId(hostHolder.getUser().getId())
+                .setEntityType(comment.getEntityType())
+                .setEntityId(comment.getEntityId())
+                .setData("postId", discussPostId);
+
+        if (comment.getEntityType() == ENTITY_TYPE_POST) {
+            DiscussPost target = discussPostService.findDiscussPostById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        } else if (comment.getEntityType() == ENTITY_TYPE_COMMENT) {
+            Comment target = commentService.findCommentById(comment.getEntityId());
+            event.setEntityUserId(target.getUserId());
+        }
+
+        eventProducer.fireEvent(event);
+
+        return "redirect:/discuss/detail" + discussPostId;
     }
 
 }
