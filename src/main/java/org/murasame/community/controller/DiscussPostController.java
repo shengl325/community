@@ -1,9 +1,7 @@
 package org.murasame.community.controller;
 
-import org.murasame.community.entity.Comment;
-import org.murasame.community.entity.DiscussPost;
-import org.murasame.community.entity.Page;
-import org.murasame.community.entity.User;
+import org.murasame.community.entity.*;
+import org.murasame.community.event.EventProducer;
 import org.murasame.community.service.CommentService;
 import org.murasame.community.service.DiscussPostService;
 import org.murasame.community.service.LikeService;
@@ -40,6 +38,9 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title, String content) {
@@ -54,6 +55,14 @@ public class DiscussPostController implements CommunityConstant {
         post.setContent(content);
         post.setCreateTime(new Date());
         discussPostService.addDiscussPost(post);
+
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(post.getId());
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJSONString(0, "发布成功!");
     }
