@@ -67,7 +67,7 @@ public class CommentController implements CommunityConstant {
             eventProducer.fireEvent(event);
         }
 
-        return "redirect:/discuss/detail" + discussPostId;
+        return "redirect:/discuss/detail/" + discussPostId;
     }
 
 }

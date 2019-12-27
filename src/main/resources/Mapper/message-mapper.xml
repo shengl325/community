@@ -26,7 +26,7 @@
         limit #{offset}, #{limit}
     </select>
 
-    <select id="selectConversationCount" resultType="message">
+    <select id="selectConversationCount" resultType="int">
         select count(m.maxid) from (
             select max(id) as maxid from message
             where status != 2
@@ -103,7 +103,7 @@
         where status = 0
         and from_id = 1
         and to_id = #{userId}
-        <if test="topic!=null>">
+        <if test="topic!=null">
             and conversation_id = #{topic}
         </if>
     </select>

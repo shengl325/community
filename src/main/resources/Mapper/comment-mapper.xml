@@ -31,8 +31,8 @@
         and entity_id = #{entityId}
     </select>
 
-    <insert id="insertCountByEntity" parameterType="Comment">
-        insert into comment(<include refid="selectFields"/>)
+    <insert id="insertComment" parameterType="Comment">
+        insert into comment(<include refid="insertFields"/>)
         values(#{userId},#{entityType},#{entityId},#{targetId},#{content},#{status},#{createTime})
     </insert>
 
