@@ -1,5 +1,6 @@
 package org.murasame.community.config;
 
+import org.murasame.community.controller.interceptor.DataInterceptor;
 import org.murasame.community.controller.interceptor.LoginRequiredInterception;
 import org.murasame.community.controller.interceptor.LoginTicketInterceptor;
 import org.murasame.community.controller.interceptor.MessageInterceptor;
@@ -20,6 +21,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private MessageInterceptor messageInterceptor;
 
+    @Autowired
+    private DataInterceptor dataInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginTicketInterceptor)
@@ -29,6 +33,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //        registry.addInterceptor(loginRequiredInterception)
 //                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
 //                        "/**/*.jpeg");
+
+        registry.addInterceptor(messageInterceptor)
+                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
+                        "/**/*.jpeg");
 
         registry.addInterceptor(messageInterceptor)
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
