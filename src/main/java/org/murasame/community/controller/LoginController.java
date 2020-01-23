@@ -6,7 +6,7 @@ import org.murasame.community.entity.User;
 import org.murasame.community.service.UserService;
 import org.murasame.community.util.CommunityConstant;
 import org.murasame.community.util.CommunityUtil;
-import org.murasame.community.util.RedisKeyUtils;
+import org.murasame.community.util.RedisKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -102,7 +101,7 @@ public class LoginController implements CommunityConstant {
         cookie.setPath(contextPath);
         response.addCookie(cookie);
         // 将验证码存入Redis
-        String redisKey = RedisKeyUtils.getKaptchaKey(kaptchaOwner);
+        String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
         redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS);
 
         // 将图片输出给浏览器
@@ -122,7 +121,7 @@ public class LoginController implements CommunityConstant {
         // 检查验证码
         String kaptcha = null;
         if (StringUtils.isNotBlank(kaptchaOwner)) {
-            String redisKey = RedisKeyUtils.getKaptchaKey(kaptchaOwner);
+            String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
             kaptcha = (String) redisTemplate.opsForValue().get(redisKey);
         }
 

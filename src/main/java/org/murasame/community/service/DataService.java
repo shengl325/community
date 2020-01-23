@@ -1,6 +1,6 @@
 package org.murasame.community.service;
 
-import org.murasame.community.util.RedisKeyUtils;
+import org.murasame.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -25,7 +25,7 @@ public class DataService {
 
     // 将指定的IP计入UV
     public void recordUV(String ip) {
-        String redisKey = RedisKeyUtils.getUVKey(df.format(new Date()));
+        String redisKey = RedisKeyUtil.getUVKey(df.format(new Date()));
         redisTemplate.opsForHyperLogLog().add(redisKey, ip);
     }
 
@@ -40,13 +40,13 @@ public class DataService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         while (!calendar.getTime().after(end)) {
-            String key = RedisKeyUtils.getUVKey(df.format(calendar.getTime()));
+            String key = RedisKeyUtil.getUVKey(df.format(calendar.getTime()));
             keyList.add(key);
             calendar.add(Calendar.DATE, 1);
         }
 
         // 合并这些数据
-        String redisKey = RedisKeyUtils.getUVKey(df.format(start), df.format(end));
+        String redisKey = RedisKeyUtil.getUVKey(df.format(start), df.format(end));
         redisTemplate.opsForHyperLogLog().union(redisKey, keyList.toArray());
 
         // 返回统计的结果
@@ -55,7 +55,7 @@ public class DataService {
 
     // 将指定用户计入DAU
     public void recordDAU(int userId) {
-        String redisKey = RedisKeyUtils.getDAUKey(df.format(new Date()));
+        String redisKey = RedisKeyUtil.getDAUKey(df.format(new Date()));
         redisTemplate.opsForValue().setBit(redisKey, userId, true);
     }
 
@@ -70,7 +70,7 @@ public class DataService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         while (!calendar.getTime().after(end)) {
-            String key = RedisKeyUtils.getDAUKey(df.format(calendar.getTime()));
+            String key = RedisKeyUtil.getDAUKey(df.format(calendar.getTime()));
             keyList.add(key.getBytes());
             calendar.add(Calendar.DATE, 1);
         }
@@ -79,7 +79,7 @@ public class DataService {
         return (long) redisTemplate.execute(new RedisCallback() {
             @Override
             public Object doInRedis(RedisConnection connection) throws DataAccessException {
-                String redisKey = RedisKeyUtils.getDAUKey(df.format(start), df.format(end));
+                String redisKey = RedisKeyUtil.getDAUKey(df.format(start), df.format(end));
                 connection.bitOp(RedisStringCommands.BitOperation.OR,
                         redisKey.getBytes(), keyList.toArray(new byte[0][0]));
                 return connection.bitCount(redisKey.getBytes());

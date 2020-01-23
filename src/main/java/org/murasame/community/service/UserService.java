@@ -1,14 +1,13 @@
 package org.murasame.community.service;
 
 import org.apache.commons.lang3.StringUtils;
-import org.murasame.community.dao.LoginTicketMapper;
 import org.murasame.community.dao.UserMapper;
 import org.murasame.community.entity.LoginTicket;
 import org.murasame.community.entity.User;
 import org.murasame.community.util.CommunityConstant;
 import org.murasame.community.util.CommunityUtil;
 import org.murasame.community.util.MailClient;
-import org.murasame.community.util.RedisKeyUtils;
+import org.murasame.community.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -163,7 +162,7 @@ public class UserService implements CommunityConstant {
         loginTicket.setStatus(0);
         loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
 
-        String redisKey = RedisKeyUtils.getTicketKey(loginTicket.getTicket());
+        String redisKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
         redisTemplate.opsForValue().set(redisKey, loginTicket);
 
         map.put("ticket", loginTicket.getTicket());
@@ -172,14 +171,14 @@ public class UserService implements CommunityConstant {
     }
 
     public void logout(String ticket) {
-        String redisKey = RedisKeyUtils.getTicketKey(ticket);
+        String redisKey = RedisKeyUtil.getTicketKey(ticket);
         LoginTicket loginTicket = (LoginTicket) redisTemplate.opsForValue().get(redisKey);
         loginTicket.setStatus(1);
         redisTemplate.opsForValue().set(redisKey, loginTicket);
     }
 
     public LoginTicket findLoginTicket(String ticket) {
-        String redisKey = RedisKeyUtils.getTicketKey(ticket);
+        String redisKey = RedisKeyUtil.getTicketKey(ticket);
         return (LoginTicket) redisTemplate.opsForValue().get(redisKey);
     }
 
@@ -195,21 +194,21 @@ public class UserService implements CommunityConstant {
 
     // 1.优先从缓存中取值
     private User getUserFromCache(int userId) {
-        String redisKey = RedisKeyUtils.getUserKey(userId);
+        String redisKey = RedisKeyUtil.getUserKey(userId);
         return (User) redisTemplate.opsForValue().get(redisKey);
     }
 
     // 2.取不到时访问MySQL数据库以初始化缓存数据
     private User initUserToCache(int userId) {
         User user = userMapper.selectById(userId);
-        String redisKey = RedisKeyUtils.getUserKey(userId);
+        String redisKey = RedisKeyUtil.getUserKey(userId);
         redisTemplate.opsForValue().set(redisKey, user, 3600, TimeUnit.SECONDS);
         return user;
     }
 
     // 3.数据变更时清除缓存数据
     private void clearCache(int userId) {
-        String redisKey = RedisKeyUtils.getUserKey(userId);
+        String redisKey = RedisKeyUtil.getUserKey(userId);
         redisTemplate.delete(redisKey);
     }
 

@@ -2,7 +2,7 @@ package org.murasame.community.util;
 
 import org.murasame.community.entity.User;
 
-public class RedisKeyUtils {
+public class RedisKeyUtil {
 
     private static final String SPLIT = ":";
     private static final String PREFIX_ENTITY_LIKE = "like:entity";
@@ -14,6 +14,7 @@ public class RedisKeyUtils {
     private static final String PREFIX_USER = "user";
     private static final String PREFIX_UV = "uv";
     private static final String PREFIX_DA = "da";
+    private static final String PREFIX_POST = "post";
 
     // 某个实体的赞
     // like:entity:entityType:entityId -> set(userId)
@@ -72,6 +73,11 @@ public class RedisKeyUtils {
     // 区间活跃用户
     public static String getDAUKey(String startDate, String endDate) {
         return PREFIX_DA + SPLIT + startDate + SPLIT + endDate;
+    }
+
+    // 帖子分数
+    public static String getPostScoreKey() {
+        return PREFIX_POST + SPLIT + "score";
     }
 
 }
